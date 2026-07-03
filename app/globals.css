@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import '@neondatabase/auth-ui/css';
 
 :root {
   --background: #0d0d12;
