@@ -1,3 +1,9 @@
-export default async function NewEventPage() {
- return <div className="mx-auth w-full max-w-2xl"></div>
+import { CreateEventForm } from "@/components/form"
+
+export default function NewEventPage() {
+  return (
+    <div className="flex min-h-screen items-center justify-center p-6 md:p-10">
+      <CreateEventForm />
+    </div>
+  )
 }

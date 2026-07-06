@@ -1,12 +1,21 @@
 // proxy.ts
-import { auth } from '@/lib/auth/server';
+import { NextRequest, NextResponse } from "next/server";
 
-export default auth.middleware({
-  loginUrl: '/auth/sign-in',
-});
+function isServerActionPost(request: NextRequest) {
+  if (request.method !== "POST") return false;
+  const h = request.headers;
+  return Boolean(h.get("Next-Action") ?? h.get("next-action"));
+}
+
+export default async function proxy(request: NextRequest) {
+  if (isServerActionPost(request)) {
+    return NextResponse.next();
+  }
+
+  const { auth } = await import("@/lib/auth/server");
+  return auth.middleware({ loginUrl: "/auth/sign-in" })(request);
+}
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
