@@ -3,6 +3,21 @@ import { Button } from "./ui/button";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
+import type {RsvpStatus as PrismaRsvpStatus } from "@/app/generated/prisma/enums";
+
+export function countByStatus(rsvps: {status: PrismaRsvpStatus}[]) {
+    let goingCount = 0;
+    let maybeCount = 0;
+    let notGoingCount = 0;
+
+    for (const r of rsvps) {
+        if (r.status === "going") goingCount += 1;
+        else if (r.status === "maybe") maybeCount += 1;
+        else if (r.status === "not_going") notGoingCount +=1;
+    }
+
+    return {goingCount, maybeCount, notGoingCount};
+}
 
 export async function DashboardContent({userId} : {userId: string}) {
 
@@ -14,7 +29,7 @@ export async function DashboardContent({userId} : {userId: string}) {
             title: true,
             eventDate: true,
             location: true,
-            // rsvps: {select: {status: true}},
+            rsvps: {select: {status: true}},
         },
     });
 
@@ -23,6 +38,7 @@ export async function DashboardContent({userId} : {userId: string}) {
         title: e.title,
         eventDate: e.eventDate ? e.eventDate.toISOString() : null,
         location: e.location,
+        ...countByStatus(e.rsvps),
     }));
 
     return <div className="flex flex-1 flex-col gap-6">
@@ -50,20 +66,20 @@ export async function DashboardContent({userId} : {userId: string}) {
                </CardContent>
           </Card> 
         ) : (
-             <div className="flex flex-col gap-3">
+             <div className="flex flex-col gap-3 grid gap-4 md:grid-cols-2">
                 {events.map((event) => (
-                    <Card key={event.id}>
-                        <CardHeader className="gap-3 px-5 py-4">
+                    <Card key={event.id} >
+                        <CardHeader className="gap-3 px-5 py-4 space-y-3">
                             <div className="flex flex-wrap items-center justify-between gap-3">
-                                <CardTitle>{event.title}</CardTitle>
-                                <Button asChild>
+                                <CardTitle className="text-lg">{event.title}</CardTitle>
+                                <Button size="sm" asChild>
                                     <Link href={`/events/${event.id}`}>Open</Link>
                                 </Button>
                             </div>
-                            <div className="flex gap-2">
-                                <Badge variant="secondary"/>
-                                <Badge variant="secondary"/>
-                                <Badge variant="secondary"/>
+                            <div className="flex gap-2 flex-wrap text-xs">
+                                <Badge>Going: {event.goingCount}</Badge>
+                                <Badge variant="secondary">Maybe: {event.maybeCount}</Badge>
+                                <Badge variant="outline">Not Going: {event.notGoingCount}</Badge>
                             </div>
                             <p className="text-sm text-[var(--muted-foreground)]">
                                 {event.eventDate
