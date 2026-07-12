@@ -66,7 +66,7 @@ export async function DashboardContent({userId} : {userId: string}) {
                </CardContent>
           </Card> 
         ) : (
-             <div className="flex flex-col gap-3 grid gap-4 md:grid-cols-2">
+             <div className="grid gap-4 md:grid-cols-2">
                 {events.map((event) => (
                     <Card key={event.id} >
                         <CardHeader className="gap-3 px-5 py-4 space-y-3">
