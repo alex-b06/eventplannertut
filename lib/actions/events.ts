@@ -48,6 +48,9 @@ function parseRsvp(formData: FormData) {
 
 export async function createEventAction(formData: FormData) {
   const session = await getSession();
+  if (!session.data?.user) {
+    throw new Error("Not authenticated.");
+  }
   const userId = session.data.user.id;
   const input = parseCreateEvent(formData);
 
@@ -66,6 +69,9 @@ export async function createEventAction(formData: FormData) {
 
 export async function createInviteActionForEvent(eventId: string) {
     const session = await getSession();
+    if (!session.data?.user) {
+        throw new Error("Not authenticated.");
+    }
     const userId = session.data.user.id;
 
     const event = await prisma.event.findFirst({
@@ -89,6 +95,9 @@ export async function createInviteActionForEvent(eventId: string) {
 
 export async function createInviteLinkAction(eventId: string) {
   const session = await getSession();
+  if (!session.data?.user) {
+    throw new Error("Not authenticated.");
+  }
   const userId = session.data.user.id;
 
   const owns = await prisma.event.findFirst({
